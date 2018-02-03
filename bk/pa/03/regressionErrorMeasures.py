@@ -60,12 +60,14 @@ if __name__ == '__main__':
     for val in target:
         targetDeviation.append((val - targetMean) * (val - targetMean))
 
-    # 计算目标变量 - 平均值
+    # 计算目标变量 - 平均值，
     print("")
     print("Target Variance = ", sum(targetDeviation) / len(targetDeviation)) # 7.570347222222222
 
     print("")
     print("Target Standard Deviation=", sqrt(sum(targetDeviation) / len(targetDeviation))) # 2.7514263977475797
+
+    # RMSE 1.65 大约是目标平均差 2.75 的一半， 这已经是相当不错的性能
 
     # 评估性能
     print("")
