@@ -4,7 +4,7 @@
 # 创建日期：2018/2/1
 # -------------------------------------------------------------------------
 
-import requests
+from bk.pa.common import open_url
 import numpy as np
 from sklearn.tree import DecisionTreeRegressor
 from sklearn import tree
@@ -13,37 +13,37 @@ target_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-qual
 
 if __name__ == '__main__':
 
-    # 超时60秒， 加载文件到内存中
-    r = requests.get(target_url, timeout=60)
-
-    # 存放数据到列表中
-    xList = []
-    labels = []
+    # 读取数据集并进行解析， 包括标签和数据
+    xList = []  # 数据集
+    labels = [] # 标签集
     names = []
     firstLine = True
+    with open_url(target_url, cache_dir="../data") as data:
+        for line in data:
+            if firstLine:
+                names = line.strip().split(";")
+                firstLine = False
+            else:
+                row = line.strip().split(";")
+                labels.append(float(row[-1]))
+                # 移除标签列
+                row.pop()
+                # 转换列值为浮点数
+                floatRow = [float(num) for num in row]
+                xList.append(row)
 
-    pos = r.text.index('\n')
-    start = 0
-    while pos != -1:
-        try:
-            line = r.text[start:pos]
-            print(line)
+    nrows = len(xList)
+    ncols = len(xList[0])
 
-            # 读入一行，对数据按逗号进行分割，将结果列表存入输出列表
-            row = line.strip().split(",")
-            xList.append(row)
-            start = pos + 1
-            pos = r.text.index('\n', start)
-        except ValueError as ve:
-            break
-    nrow = len(xList)  # 列数
-    ncol = len(xList[1])  # 行数
-
-    names = xList[0]
-    xList.pop()
-
+    # 使用二元决策树模型
     wineTree = DecisionTreeRegressor(max_depth=3)
-    wineTree.fit(xList, names)
+    # 传入数据集及字段名称
+    wineTree.fit(xList, labels)
 
+    # 输出决策树的决策图
     with open("wineTree.dot",'w') as f:
         f = tree.export_graphviz(wineTree, out_file = f)
+
+    # Note: The code above exports the trained tree info to a Graphviz "dot" file.
+    # Drawing the graph requires installing GraphViz and the running the following on the command line
+    # dot -Tpng wineTree.dot -o wineTree.png

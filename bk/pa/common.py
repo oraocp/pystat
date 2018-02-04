@@ -5,12 +5,21 @@
 # -------------------------------------------------------------------------
 
 import os
+
 import requests
 
 
-def open_url(surl, params=None):
+def open_url(surl, params=None, cache_dir=""):
+    """
+    打开远程文件URL地址，通过GET方法获取文件，并且输出文件流。
+    文件会缓存
+    :param surl: 远程文件URL地址
+    :param params: GET请求参数
+    :param cache_dir: 数据文件缓存放的目录名称
+    :return: 文件输出流
+    """
     pos = surl.rindex("/")
-    filename = surl[pos + 1:]
+    filename = cache_dir+"/"+surl[pos + 1:]
     if not os.path.exists(filename):
         with open(filename, mode="wb") as w:
             # 超时60秒， 加载文件到内存中
@@ -24,6 +33,6 @@ def open_url(surl, params=None):
 
 if __name__ == '__main__':
     target_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
-    with open_url(target_url) as data:
+    with open_url(target_url, cache_dir="data") as data:
         for line in data:
             print(line)
