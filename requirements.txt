@@ -1,4 +1,6 @@
+sklearn
 numpy
 scipy
 matplotlib
 scikit-learn
+pydotplus
